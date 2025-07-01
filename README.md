@@ -12,6 +12,8 @@ cd customer-support-ai-api
 cp .env.example .env
 ```
 
+# 1.1 setting the OPENAI_API_KEY and HUGGINGFACE_TOKEN
+
 # 2. Start services
 ```bash
 docker-compose --profile dev up -d
