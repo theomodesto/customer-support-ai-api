@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  # Database
+  customer_support_db:
+    image: postgres:16
+    container_name: customer_support_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: customer_support_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./app/db/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - customer_support_network
+      
+  # FastAPI Application
+  customer_support_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: customer_support_api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@customer_support_db:5432/customer_support_db
+      - DEBUG=false
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - HUGGINGFACE_TOKEN=${HUGGINGFACE_TOKEN:-}
+      - CLASSIFIER_MODEL=${CLASSIFIER_MODEL:-open_ai}
+    depends_on:
+      customer_support_db:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - customer_support_network
+    profiles:
+      - dev
+  
+  # UI React Application
+  customer_support_ui:
+    build:
+      context: ./ui-react
+      dockerfile: Dockerfile
+    container_name: customer_support_ui
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://customer_support_api:8000
+    networks:
+      - customer_support_network
+    depends_on:
+      customer_support_api:
+        condition: service_healthy
+    profiles:
+      - dev
+
+  # Database Migration Service (optional)
+  db_migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: customer_support_migrate
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@customer_support_db:5432/customer_support_db
+    depends_on:
+      customer_support_db:
+        condition: service_healthy
+    networks:
+      - customer_support_network
+    profiles:
+      - migrate
+
+volumes:
+  postgres_data:
+
+networks:
+  customer_support_network:
+    driver: bridge

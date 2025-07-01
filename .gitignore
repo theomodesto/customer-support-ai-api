@@ -1,0 +1,16 @@
+venv/**
+.env
+__pycache__/**
+.DS_Store
+*/__pycache__/**
+*/__pycache__
+*/__pycache__/**
+*/__pycache__/**
+/__pycache__/
+**.pyc
+.pytest_cache/
+test.db
+env.docker.example
+fine_tuned_bart/
+.conv
+.coverage

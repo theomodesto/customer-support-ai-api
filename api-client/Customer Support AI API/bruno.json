@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Customer Support AI API",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

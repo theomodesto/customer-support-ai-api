@@ -1,0 +1,15 @@
+meta {
+  name: get -requests--support_ticket_id-
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://requests/{support_ticket_id}
+  body: none
+  auth: none
+}
+
+params:path {
+  support_ticket_id: 
+}
