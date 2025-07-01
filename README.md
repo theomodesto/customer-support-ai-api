@@ -39,9 +39,9 @@ CLASSIFIER_MODEL=hugging_face
 ```
 
 # 5. Access applications
-# API: http://localhost:8000
-# UI: http://localhost:3000
-# Docs: http://localhost:8000/docs
+### API: http://localhost:8000
+### UI: http://localhost:3000
+### Docs: http://localhost:8000/docs
 
 # 6. Run test
 ```bash
@@ -91,37 +91,6 @@ This helps your support team focus on what matters most.
 - A nice web interface to view and manage requests
 - Statistics dashboard to track your support trends
 - Works with popular AI services (OpenAI, Hugging Face)
-
-## Quick Setup
-
-### The Easy Way (Docker)
-
-1. **Get the code**
-```bash
-git clone <your-repo-url>
-cd customer-support-ai-api
-```
-
-2. **Set up your settings**
-```bash
-cp .env.example .env
-# Edit the .env file with your details
-```
-
-3. **Start everything**
-```bash
-docker-compose --profile dev up -d
-```
-
-4. **Set up the database**
-```bash
-docker-compose --profile migrate up
-```
-
-5. **Check it out**
-   - API: http://localhost:8000
-   - Web Interface: http://localhost:3000
-   - API Documentation: http://localhost:8000/docs
 
 ### Manual Setup (For Developers)
 
@@ -225,25 +194,6 @@ curl "http://localhost:8000/stats"
 ├── tests/            # Test files
 ├── scripts/          # Helper scripts
 └── docs/             # Documentation
-```
-
-## Common Problems
-
-**Database won't connect?**
-```bash
-docker-compose ps  # Check if database is running
-docker-compose logs customer_support_db  # Check logs
-```
-
-**AI not working?**
-- Check your `.env` file has the right settings
-- Make sure you have internet connection (for Hugging Face/OpenAI)
-- Verify your API keys are correct
-
-**Ports already in use?**
-```bash
-lsof -i :8000  # Check what's using port 8000
-lsof -i :3000  # Check what's using port 3000
 ```
 
 ## Production Deployment
