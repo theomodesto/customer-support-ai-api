@@ -60,8 +60,9 @@ class AIClassifier:
             valid_models = ["open_ai", "hugging_face", "fine_tuned_bart"]
             raise ValueError(f"Invalid classifier model: {self.model_name}. Valid models are: {valid_models}")
 
-        # self.category_labels = ["technical", "billing", "general"]
-        self.category_labels = [
+        self.category_labels_openai = ["technical", "billing", "general"]
+
+        self.category_labels_huggingface = [
             "This ticket is about a technical issue such as system configuration, security setup, software malfunction, or data protection",
             "This ticket is about a billing, invoice, or payment-related issue",
             "This ticket is a general question or request that is not related to technical problems or billing"
@@ -150,7 +151,7 @@ class AIClassifier:
         """Classify and summarize using Hugging Face models."""
         try:
             # Category classification
-            classification_result = cast(dict, self.classifier(text, self.category_labels, hypothesis_template="{}"))
+            classification_result = cast(dict, self.classifier(text, self.category_labels_huggingface, hypothesis_template="{}"))
             category = self.category_labels_dict[classification_result['labels'][0]]
             confidence_score = classification_result['scores'][0]
 
@@ -270,7 +271,7 @@ class AIClassifier:
             summary = summary_match.group(1).strip() if summary_match else "Could not generate summary."
             
             # Validate category
-            if category not in self.category_labels:
+            if category not in self.category_labels_openai:
                 logger.warning(
                     f"OpenAI returned invalid category: {category}",
                     component="ai_classification",
