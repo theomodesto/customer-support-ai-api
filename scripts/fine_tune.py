@@ -20,7 +20,7 @@ def main():
     # Take only 100 examples for fast training
     count = 0
     for item in train_data:
-        if count >= 100:  # Reduced from 500 to 100
+        if count >= 20000:  
             break
             
         try:
@@ -43,11 +43,15 @@ def main():
             
             if not text:
                 continue
+
+            # Technical Support/IT Support → technical;
+            # Billing and Payments → billing;
+            # Customer Service/Product Support → general
                 
             # Simple category mapping
-            if 'technical' in queue or 'it' in queue or 'support' in queue:
+            if 'technical' in queue or 'it' in queue or ('it' in queue and 'support' in queue) or ('technical' in queue and 'support' in queue):
                 category = "technical"
-            elif 'billing' in queue or 'payment' in queue or 'account' in queue:
+            elif 'billing' in queue or 'payment' in queue or ('billing' in queue and 'payments' in queue):
                 category = "billing"
             else:
                 category = "general"
@@ -67,10 +71,16 @@ def main():
     
     # Create NLI data
     nli_data = []
+    # hypotheses = {
+    #     "technical": "This is a technical support request.",
+    #     "billing": "This is a billing request.",
+    #     "general": "This is a general inquiry."
+    # }
+
     hypotheses = {
-        "technical": "This is a technical support request.",
-        "billing": "This is a billing request.",
-        "general": "This is a general inquiry."
+        "technical": "This ticket is about a technical issue such as system configuration, security setup, software malfunction, or data protection",
+        "billing": "This ticket is about a billing, invoice, or payment-related issue",
+        "general": "This ticket is a general question or request that is not related to technical problems or billing"
     }
     
     for item in data:
@@ -97,7 +107,7 @@ def main():
             examples["hypothesis"],
             truncation=True,
             padding="max_length",
-            max_length=256,  # Reduced from 512 to 256 for speed
+            max_length=128,  # Reduced from 512 to 256 for speed
             return_tensors=None  # Don't return tensors here
         )
         result["labels"] = examples.get("label")
@@ -123,9 +133,9 @@ def main():
         model=model,
         args=TrainingArguments(
             output_dir="./models/fine_tuned_bart",
-            learning_rate=2e-5,
-            per_device_train_batch_size=2,  # Reduced from 4 to 2
-            per_device_eval_batch_size=2,   # Reduced from 4 to 2
+            learning_rate=1e-5,
+            per_device_train_batch_size=4,  # Reduced from 4 to 2
+            per_device_eval_batch_size=4,   # Reduced from 4 to 2
             num_train_epochs=1,             # Keep at 1 epoch
             save_strategy="epoch",
             push_to_hub=False,

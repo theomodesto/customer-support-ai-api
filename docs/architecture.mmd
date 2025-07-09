@@ -1,0 +1,29 @@
+graph TD;
+    subgraph "User"
+        browser[Browser]
+    end
+
+    subgraph "Docker Environment"
+        ui["React Frontend - Port: 3000 <br> (customer_support_ui)"]
+        api["FastAPI Backend - Port: 8000 <br> (customer_support_api)"]
+        db["PostgreSQL Database <br> (customer_support_db)"]
+        migrate["Alembic Migration <br> (db_migrate)"]
+
+        subgraph "API Internal Components"
+            api --> ai_classifier["AI Classifier"]
+            ai_classifier --> hf["Hugging Face <br> Fine-tuned BART"]
+            ai_classifier --> openai["OpenAI API"]
+        end
+    end
+
+    browser -->|"HTTP Requests"|ui
+    ui -->|"API Calls"| api
+    api -->|"Database Queries"| db
+    migrate -->|"Applies Migrations"| db
+
+    style ui fill:#61DAFB,stroke:#333,stroke-width:2px
+    style api fill:#009688,stroke:#333,stroke-width:2px
+    style db fill:#336791,stroke:#333,stroke-width:2px
+    style migrate fill:#f39c12,stroke:#333,stroke-width:2px
+    style hf fill:#1FD600,stroke:#333,stroke-width:2px
+    style openai fill:#4CAF50,stroke:#333,stroke-width:2px
